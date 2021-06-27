@@ -6,16 +6,16 @@ use InvalidArgumentException;
 
 class Coordinate
 {
-    private int $x;
-    private int $y;
+    private $x;
+    private $y;
 
     public function __construct(int $x, int $y)
     {
         $this->validateCoordinate($x);
         $this->validateCoordinate($y);
 
-        $this->x = $x;
-        $this->y = $y;
+        $this->x = $x - 1;
+        $this->y = $y - 1;
     }
 
     private function validateCoordinate(int $coordinate): void
@@ -33,5 +33,13 @@ class Coordinate
     public function getY(): int
     {
         return $this->y;
+    }
+
+    public function __toString(): string
+    {
+        $x = $this->getX() + 1;
+        $y = $this->getY() + 1;
+
+        return "$x:$y";
     }
 }

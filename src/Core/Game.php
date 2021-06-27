@@ -2,24 +2,38 @@
 
 namespace App\Core;
 
+use App\Core\Strategies\RandomMovementStrategy;
+
 class Game
 {
+    private $gameData;
+    private $map;
+    private $userData;
+
     public function __construct(
-        private GameData $gameData,
-        private Map $map,
-        private string $userData,
+        GameData $gameData,
+        Map $map,
+        string $userData
     ) {
+        $this->gameData = $gameData;
+        $this->map = $map;
+        $this->userData = $userData;
     }
 
-    public function play(): void
+    public function play(): string
     {
-        // Hier waarschijnlijk een foreach robot -> execute()
-        // Dan uiteindelijk deze string returnen naar het systeem
-        // zodat er iets gebeurd. (de collectieve move)
+        $myRobots = $this->map->friendlyRobots();
+        $strategy = new RandomMovementStrategy(
+            $this->gameData->getCurrentTurn(),
+            $this->map
+        );
 
-        // Dus voor robots zouden we een spl obj storage kunnen hanteren
-        // van robots, deze zijn bewust van hun locatie op de map?
-        // waar de map enkel inzicht geeft in de tiles? en wat er op een tile staat
-        // en dus een API biedt voor bijvoorbeeld afstanden bepalen etc. voor een robot.
+        $stdOut = [];
+
+        foreach ($myRobots as $robot) {
+            $stdOut[] = $strategy->execute($robot);
+        }
+
+        return implode(',', $stdOut);
     }
 }

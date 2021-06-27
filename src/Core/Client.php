@@ -7,7 +7,7 @@ class Client
     public static function main()
     {
         $gameReader = new GameReader;
-        $info = $gameReader->read(STDIN);
+        $info = $gameReader->read('php://stdin');
 
         $gameData = new GameData(...explode(',', $info['game_data']));
         $map = new Map(explode(',', $info['map_state']));
@@ -16,3 +16,5 @@ class Client
         echo (new Game($gameData, $map, $userData))->play();
     }
 }
+
+Client::main();

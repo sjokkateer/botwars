@@ -4,11 +4,18 @@ namespace App\Core;
 
 class GameData
 {
+    private $currentTurn;
+    private $lastTurn;
+    private $ourPlayerId;
+
     public function __construct(
-        private int $currentTurn,
-        private int $lastTurn,
-        private int $ourPlayerId,
+        int $currentTurn,
+        int $lastTurn,
+        int $ourPlayerId
     ) {
+        $this->currentTurn = $currentTurn;
+        $this->lastTurn = $lastTurn;
+        $this->ourPlayerId = $ourPlayerId;
     }
 
     public function getCurrentTurn(): int

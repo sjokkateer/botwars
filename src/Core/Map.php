@@ -12,7 +12,7 @@ class Map
         'E' => HostileRobot::class,
     ];
 
-    private array $mapGrid;
+    private $mapGrid;
 
     public function __construct(array $robotData)
     {
@@ -30,38 +30,84 @@ class Map
         }
     }
 
-    // Grid is an array of arrays.
-    // a tile is empty meaning there is
-    // no robot on it. Otherwise
-    // it will contain a robot on it.
     private function makeGrid(): array
     {
         $grid = [];
 
-        for ($i = 0; $i < self::HEIGHT; $i++) {
+        for ($y = 0; $y < self::HEIGHT; $y++) {
             $grid[] = [];
 
-            for ($j = 0; $j < self::WIDTH; $j++) {
-                $grid[$i][] = [];
+            for ($x = 0; $x < self::WIDTH; $x++) {
+                $grid[$y][] = [];
+
+                if ($this->shouldBeBlocked($x, $y)) {
+                    $grid[$y][$x][] = new Block;
+                }
             }
         }
 
         return $grid;
     }
 
-    private function placeOnMap(AbstractRobot $robot): void
+    private function shouldBeBlocked(int $x, int $y): bool
     {
-        // x, y both start at 1
+        return $x === 0
+            || $x === 15
+            || $y === 0
+            || $y === 15
+            || $x === 14 && $y === 1
+            || $y === 14 && $x === 1
+            || $x === 1 && $y === 1
+            || $x === 14 && $y === 14;
+    }
+
+    public function placeOnMap(AbstractRobot $robot): void
+    {
         $location = $robot->getLocation();
 
         for ($y = 0; $y < count($this->mapGrid); $y++) {
             for ($x = 0; $x < count($this->mapGrid[$y]); $x++) {
-                if ($location->getY() - 1 === $y && $location->getX() - 1 === $x) {
+                if ($location->getY() === $y && $location->getX() === $x) {
                     $this->mapGrid[$y][$x] = $robot;
 
                     break;
                 }
             }
         }
+    }
+
+    public function neighbors(AbstractRobot $robot): array
+    {
+        $location = $robot->getLocation();
+
+        $x = $location->getX();
+        $y = $location->getY();
+
+        $neighbors = [
+            'U' => ['coordinates' => ['x' => $x, 'y' => $y + 1], 'holds' => $this->mapGrid[$y + 1][$x]],
+            'L' => ['coordinates' => ['x' => $x - 1, 'y' => $y], 'holds' => $this->mapGrid[$y][$x - 1]],
+            'D' => ['coordinates' => ['x' => $x, 'y' => $y - 1], 'holds' => $this->mapGrid[$y - 1][$x]],
+            'R' => ['coordinates' => ['x' => $x + 1, 'y' => $y], 'holds' => $this->mapGrid[$y][$x + 1]],
+        ];
+
+        $neighbors['N'] = $neighbors['U'];
+        $neighbors['E'] = $neighbors['R'];
+        $neighbors['S'] = $neighbors['D'];
+        $neighbors['W'] = $neighbors['L'];
+
+        return $neighbors;
+    }
+
+    public function friendlyRobots(): array
+    {
+        $friendlyRobots = [];
+
+        for ($y = 0; $y < count($this->mapGrid); $y++) {
+            for ($x = 0; $x < count($this->mapGrid[$y]); $x++) {
+                if ($this->mapGrid[$y][$x] instanceof FriendlyRobot) $friendlyRobots[] = $this->mapGrid[$y][$x];
+            }
+        }
+
+        return $friendlyRobots;
     }
 }
