@@ -7,27 +7,11 @@ class Map
     private const WIDTH = 16;
     private const HEIGHT = 16;
 
-    private const ROBOT_TYPE = [
-        'F' => FriendlyRobot::class,
-        'E' => HostileRobot::class,
-    ];
-
     private $mapGrid;
 
-    public function __construct(array $robotData)
+    public function __construct()
     {
         $this->mapGrid = $this->makeGrid();
-
-        foreach ($robotData as $robot) {
-            $data = explode('-', $robot);
-
-            [$type, $coordinates, $health] = [$data[0], explode(':', $data[1]), $data[2]];
-
-            $class = self::ROBOT_TYPE[$type];
-            $robot = new $class(new Coordinate(...$coordinates), $health);
-
-            $this->placeOnMap($robot);
-        }
     }
 
     private function makeGrid(): array
