@@ -4,6 +4,11 @@ namespace App\Core;
 
 abstract class AbstractRobot
 {
+    private const ROBOT_TYPE = [
+        'F' => FriendlyRobot::class,
+        'E' => HostileRobot::class,
+    ];
+
     private $location;
     private $health;
 
@@ -28,5 +33,12 @@ abstract class AbstractRobot
     public function getHealth(): int
     {
         return $this->health;
+    }
+
+    public static function create(string $type, Coordinate $location, int $health)
+    {
+        $class = self::ROBOT_TYPE[$type];
+
+        return new $class($location, $health);
     }
 }
