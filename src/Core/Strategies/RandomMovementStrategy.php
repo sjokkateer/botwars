@@ -3,17 +3,12 @@
 namespace App\Core\Strategies;
 
 use App\Core\AbstractRobot;
+use App\Core\Coordinate;
 use App\Core\Map;
+use Closure;
 
 class RandomMovementStrategy implements RobotStrategyInterface
 {
-    private const SPAWN_TILES = [
-        [4, 4],
-        [11, 11],
-        [4, 11],
-        [11, 4],
-    ];
-
     private static $madeMoves = [];
 
     private $currentTurn;
@@ -34,7 +29,7 @@ class RandomMovementStrategy implements RobotStrategyInterface
         $available = array_filter($available, fn ($av) => !in_array(array_values($av['coordinates']), self::$madeMoves));
 
         if ($this->currentTurn % 10 === 0) {
-            $available = array_filter($available, fn ($av) => !$this->isSpawnTile($av));
+            $available = array_filter($available, Closure::fromCallable([$this, 'isNotSpawnTile']));
         }
 
         if (empty($available)) {
@@ -48,13 +43,13 @@ class RandomMovementStrategy implements RobotStrategyInterface
         return "{$robot->getLocation()}-M-$choice";
     }
 
+    private function isNotSpawnTile(array $tile): bool
+    {
+        return $this->isSpawnTile($tile) === false;
+    }
+
     private function isSpawnTile(array $tile): bool
     {
-        $coordinates = $tile['coordinates'];
-        $t = [$coordinates['x'], $coordinates['y']];
-
-        $isSpanwTile = in_array($t, self::SPAWN_TILES);
-
-        return $isSpanwTile;
+        return in_array(array_values($tile['coordinates']), Coordinate::SPAWN_TILES);
     }
 }

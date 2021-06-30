@@ -25,7 +25,7 @@ class Map
                 $grid[$y][] = [];
 
                 if ($this->shouldBeBlocked($x, $y)) {
-                    $grid[$y][$x][] = new Block;
+                    $grid[$y][$x] = [new Block];
                 }
             }
         }
@@ -52,7 +52,7 @@ class Map
         for ($y = 0; $y < count($this->mapGrid); $y++) {
             for ($x = 0; $x < count($this->mapGrid[$y]); $x++) {
                 if ($location->getY() === $y && $location->getX() === $x) {
-                    $this->mapGrid[$y][$x] = $robot;
+                    $this->mapGrid[$y][$x] = [$robot];
 
                     break;
                 }
@@ -84,14 +84,28 @@ class Map
 
     public function friendlyRobots(): array
     {
-        $friendlyRobots = [];
+        return $this->getRobots(FriendlyRobot::class);
+    }
+
+    public function hostileRobots(): array
+    {
+        return $this->getRobots(HostileRobot::class);
+    }
+
+    private function getRobots(string $class): array
+    {
+        $robots = [];
 
         for ($y = 0; $y < count($this->mapGrid); $y++) {
             for ($x = 0; $x < count($this->mapGrid[$y]); $x++) {
-                if ($this->mapGrid[$y][$x] instanceof FriendlyRobot) $friendlyRobots[] = $this->mapGrid[$y][$x];
+                $tile = $this->mapGrid[$y][$x];
+
+                if (empty($tile) || get_class($tile[0]) !== $class) continue;
+
+                $robots[] = $tile[0];
             }
         }
 
-        return $friendlyRobots;
+        return $robots;
     }
 }

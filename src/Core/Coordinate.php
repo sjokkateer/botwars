@@ -6,6 +6,13 @@ use InvalidArgumentException;
 
 class Coordinate
 {
+    public const SPAWN_TILES = [
+        [4, 4],
+        [11, 11],
+        [4, 11],
+        [11, 4],
+    ];
+
     private $x;
     private $y;
 

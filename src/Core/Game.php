@@ -28,10 +28,16 @@ class Game
             $this->map
         );
 
-        $stdOut = [];
+        $minHeap = new SpawnTileMinHeap;
 
         foreach ($myRobots as $robot) {
-            $stdOut[] = $strategy->execute($robot);
+            $minHeap->insert($robot);
+        }
+
+        $stdOut = [];
+
+        while (!$minHeap->isEmpty()) {
+            $stdOut[] = $strategy->execute($minHeap->extract());
         }
 
         return implode(',', $stdOut);
